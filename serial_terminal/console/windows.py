@@ -231,7 +231,7 @@ class Console(ConsoleBase):
         ctypes.windll.kernel32.SetConsoleCP(self._saved_icp)
 
     def getkey(self):
-        """read from console, converting special keys to escape sequences"""
+        """read (named keys) from console"""
         while True:
             z = msvcrt.getwch()
             if z in chr(0):     # functions keys
@@ -259,6 +259,7 @@ class Console(ConsoleBase):
         self.byte_output.flush()
 
     def write(self, text):
+        """write text"""
         chars_written = ctypes.wintypes.DWORD()
         ctypes.windll.kernel32.WriteConsoleW(
             self.handle,
@@ -268,7 +269,7 @@ class Console(ConsoleBase):
             None)
 
     def set_ansi_color(self, colorcodes):
-        """set foreground text"""
+        """set color/intensity for next write(s)"""
         attrs = 0
         for colorcode in colorcodes:
             mask, code = terminal_colors_to_windows_colors[colorcode]
@@ -278,18 +279,32 @@ class Console(ConsoleBase):
         ctypes.windll.kernel32.SetConsoleTextAttribute(self.handle, attrs)
 
     def get_position_and_size(self):
+        """get cursor position (zero based) and window size"""  # XXX buffer size on windows :/
         info = CONSOLE_SCREEN_BUFFER_INFO()
         ctypes.windll.kernel32.GetConsoleScreenBufferInfo(self.handle, ctypes.byref(info))
         # print('getpos', info.dwCursorPosition.X, info.dwCursorPosition.Y, info.dwSize.X, info.dwSize.Y)
         return info.dwCursorPosition.X, info.dwCursorPosition.Y, info.dwSize.X, info.dwSize.Y
 
     def set_cursor_position(self, x, y):
+        """set cursor position (zero based)"""
         # print('setpos', x, y)
+        # XXX should limit to last line visible? the windows console starts at the top of the buffer instead of the end
         ctypes.windll.kernel32.SetConsoleCursorPosition(
             self.handle,
             ctypes.wintypes._COORD(x, y))
 
+    def move_or_scroll_down(self):
+        """move cursor down, extend and scroll if needed"""
+        self.write('\n')
+
+    def move_or_scroll_up(self):
+        """move cursor up, extend and scroll if needed"""
+        # not entirely correct
+        x, y, w, h = self.get_position_and_size()
+        self.set_cursor_position(x, y - 1)
+
     def erase(self, x, y, width, height, selective=False):
+        """erase rectangular area"""
         # print('erase', x, y, width, height, selective)
         chars_written = ctypes.wintypes.DWORD()
         spaces = ctypes.c_wchar_p(' ' * width)

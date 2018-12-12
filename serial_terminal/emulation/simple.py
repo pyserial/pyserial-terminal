@@ -26,22 +26,34 @@ class SimpleTerminal:
         # self.console.write_bytes(b'\r')
 
     def line_feed(self):
-        x, y, width, height = self.console.get_position_and_size()
-        self.console.set_cursor_position(x, y + 1)
-        # self.console.write_bytes(b'\n')
+        self.console.move_or_scroll_down()
+
+    def index(self):
+        self.console.move_or_scroll_down()
+
+    def reverse_index(self):
+        self.console.move_or_scroll_up()
 
     def backspace(self):
-        # self.cursor_backward(1)
+        """move the cursor to the left"""
+        x, y, width, height = self.console.get_position_and_size()
+        self.console.set_cursor_position(x - 1, y)
+        # self.console.write_bytes(b'\b')
+
+    def delete(self):
+        """move the cursor to the left, overprinting the character with a space"""
         x, y, width, height = self.console.get_position_and_size()
         self.console.erase(x - 1, y, 1, 1, False)
         self.console.set_cursor_position(x - 1, y)
-        # self.console.write_bytes(b'\b')
+        # self.console.write_bytes(b'\b \b')
 
     def bell(self):
         self.console.write_bytes(b'\g')
 
     def horizontal_tab(self):
-        self.console.write_bytes(b'\t')
+        x, y, width, height = self.console.get_position_and_size()
+        self.console.set_cursor_position(x + (8 - x % 8), y)
+        # self.console.write_bytes(b'\t')
 
     # def enquiry(self):
     # def vertical_tabulation(self):
@@ -54,19 +66,8 @@ class SimpleTerminal:
     # def device_control_4(self):
     # def cancel(self):
     # def substitute(self):
-    # def delete(self):
-    # def index(self):
     # def next_line(self):
     # def horizontal_tab_set(self):
-    # def reverse_index(self):
-    # def single_shift_G2(self):
-    # def single_shift_G3(self):
-    # def device_control_string(self):
-    # def string_terminator(self):
-    # def index(self):
-    # def next_line(self):
-    # def horizontal_tab_set(self):
-    # def reverse_index(self):
     # def single_shift_G2(self):
     # def single_shift_G3(self):
     # def device_control_string(self):
@@ -115,6 +116,7 @@ class SimpleTerminal:
     # def insert_character(self, mode):
     # def delete_character(self, mode):
     # def erase_display(self, mode, selective=False):
+
     def erase_in_line(self, mode, selective=False):
         x, y, width, height = self.console.get_position_and_size()
         if mode == 0:  # erase to end of line
