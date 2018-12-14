@@ -1,27 +1,35 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
-# Test support to run external tools and use our terminal emulation.
+# Python 3+ only tkinter terminal widget wrapper: show the output of a
+# console program in the widget.
 #
 # This file is part of pySerial-terminal. https://github.com/pyserial/pyserial-terminal
-# (C)2002-2018 Chris Liechti <cliechti@gmx.net>
+# (C) 2018 Chris Liechti <cliechti@gmx.net>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
-
+import pathlib
 import subprocess
 import sys
-import pathlib
+
+import tkinter as tk
+from tkinter import ttk
 
 sys.path.append(str(pathlib.Path(__file__).parent.parent))
-from serial_terminal.console import Console
+from serial_terminal.console import tk_widget
 from serial_terminal.terminal.escape_decoder import EscapeDecoder
 from serial_terminal.emulation.simple import SimpleTerminal
 
 import serial
 
-
 def main():
-    terminal = SimpleTerminal(Console())
+    root = tk.Tk()
+    root.title('pySerial-Terminal tk_widget test')
+    console = tk_widget.Console(root)
+    # console.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    console.pack()
+    terminal = SimpleTerminal(console)
     decoder = EscapeDecoder(terminal)
+
     p = subprocess.Popen([sys.executable] + sys.argv[1:], stdout=subprocess.PIPE)
     # p.stdin.close()
     while True:
@@ -30,7 +38,10 @@ def main():
             break
         for byte in serial.iterbytes(data):
             decoder.handle(byte)
-    # sys.stdout.buffer.write(b'\n')
+        root.update_idletasks()
+        root.update()
+
+    root.mainloop()
 
 
 if __name__ == "__main__":
