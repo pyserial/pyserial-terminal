@@ -315,7 +315,7 @@ def main(default_port=None, default_baudrate=9600, default_rts=None, default_dtr
             raise ValueError('invalid key name')
         for part in parts:
             if part not in MODIFIERS:
-                raise ValueError(f'{part!r} is not a valid modifier ({MODIFIERS})')
+                raise ValueError('{!r} is not a valid modifier ({})'.format(part, MODIFIERS))
         return key_name
 
     parser = argparse.ArgumentParser(description="pySerial-terminal")
@@ -505,8 +505,7 @@ def main(default_port=None, default_baudrate=9600, default_rts=None, default_dtr
         miniterm.join(True)
     except KeyboardInterrupt:
         pass
-    if not args.quiet:
-        miniterm.console.write("\r\n--- exit ---\r\n")
+    miniterm.console.write("\r\n--- exit ---\r\n")
     miniterm.join()
     miniterm.close()
 

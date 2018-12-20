@@ -191,9 +191,9 @@ class Console(scrolledtext.ScrolledText):
 
     def write(self, text):
         """write text"""
-        contents = self.get(tk.INSERT, f'insert+{len(text)}c')
+        contents = self.get(tk.INSERT, 'insert+{}c'.format(len(text)))
         if contents:
-            self.delete(tk.INSERT, f'insert+{len(contents)}c')
+            self.delete(tk.INSERT, 'insert+{}c'.format(len(contents)))
         self.insert(tk.INSERT, text, (self._fg, self._bg, self._bold))
 
     def set_ansi_color(self, colorcodes):
@@ -221,7 +221,7 @@ class Console(scrolledtext.ScrolledText):
     def set_cursor_position(self, x, y):
         """set cursor position (zero based)"""
         # print('setpos', x, y)
-        self.mark_set(tk.INSERT, f'{y + 1}.{x}')
+        self.mark_set(tk.INSERT, '{}.{}'.format(y + 1, x))
 
     def move_or_scroll_down(self):
         """move cursor down, extend and scroll if needed"""
@@ -229,7 +229,7 @@ class Console(scrolledtext.ScrolledText):
         end_y, end_x = [int(s) for s in self.index(tk.END).split('.')]
         if y + 1 >= end_y:
             self.insert(tk.END, '\n\n' + ' ' * x)
-        self.mark_set(tk.INSERT, f'{y + 1}.{x}')
+        self.mark_set(tk.INSERT, '{}.{}'.format(y + 1, x))
         self.see(tk.INSERT)
 
     def move_or_scroll_up(self):
@@ -237,15 +237,15 @@ class Console(scrolledtext.ScrolledText):
         y, x = [int(s) for s in self.index(tk.INSERT).split('.')]
         if y - 1 <= 0:
             self.insert(1.0, '\n\n' + ' ' * x)
-        self.mark_set(tk.INSERT, f'{y - 1}.{x}')
+        self.mark_set(tk.INSERT, '{}.{}'.format(y - 1, x))
         self.see(tk.INSERT)
 
     def erase(self, x, y, width, height, selective=False):
         """erase rectangular area"""
         # print('erase', x, y, width, height, selective)
         for _y in range(y + 1, y + height + 1):
-            self.delete(f'{_y}.{x}', f'{_y}.{x + width}')
-            self.insert(f'{_y}.{x}', ' ' * width)
+            self.delete('{}.{}'.format(_y, x), '{}.{}'.format(_y, x + width))
+            self.insert('{}.{}'.format(_y, x), ' ' * width)
         #     if not selective:
         #         attrs
 
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     def input_thread():
         while True:
             key = console.getkey()
-            console.write(f'{key!r} ')
+            console.write('{!r} '.format(key))
             if key == 'Ctrl+D':
                 root.quit()
     t = threading.Thread(target=input_thread, daemon=True)
