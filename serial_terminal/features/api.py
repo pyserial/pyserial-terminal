@@ -35,9 +35,9 @@ class Feature:
         text = []
         while True:
             key = self.console.getkey()
-            if key in ('\r', 'Enter', 'Ctrl+M'):
+            if key in ('\r', 'Enter', 'Ctrl+J', 'Ctrl+M'):
                 break
-            elif key in ('Esc', 'Crtl+C'):
+            elif key in ('Esc', 'Crtl+C', 'Ctrl+D'):
                 raise KeyboardInterrupt('user canceled')
             elif key == '\b':
                 if text:
