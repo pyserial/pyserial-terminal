@@ -56,7 +56,7 @@ MAP_CONTROL_KEYS = {
 }
 
 MAP_F_KEYS = {
-    '\x03': 'Ctrl+2',
+    '\x03': 'Ctrl+Space',   # actually CTRL+2 but linux has this as alias for Ctrl+Space too
     '\x3b': 'F1',
     '\x3c': 'F2',
     '\x3d': 'F3',
